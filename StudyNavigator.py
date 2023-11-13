@@ -2,7 +2,8 @@ import os
 
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QStandardItemModel, QStandardItem
-from PyQt6.QtWidgets import QFrame, QVBoxLayout, QLabel, QHBoxLayout, QWidget, QPushButton, QSizePolicy, QTreeView
+from PyQt6.QtWidgets import QFrame, QVBoxLayout, QLabel, QHBoxLayout, QWidget, QPushButton, QSizePolicy, QTreeView, \
+    QAbstractItemView
 
 from FakeDICOMGetter import FakeDICOMGetter
 from ScrollBar import ScrollBar
@@ -70,6 +71,7 @@ class StudyNavigator(QFrame):
         self.model = QStandardItemModel()
         self.study_tree.setModel(self.model)
         self.study_tree.header().hide()
+        self.study_tree.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
 
         self.layout_.addWidget(self.title)
         self.layout_.addWidget(self.study_tree)
@@ -111,3 +113,30 @@ class StudyNavigator(QFrame):
                 child.setFlags(parent.flags() & ~Qt.ItemFlag.ItemIsEditable)
                 parent.appendRow(child)
             self.model.appendRow(parent)
+
+    def select_item(self, study, series):
+        item = self._findItemByText(self.study_tree.model(), study, series)
+        if item is None:
+            return
+
+        self.study_tree.selectionModel().clearSelection()
+
+
+        idx = self.model.indexFromItem(item)
+        self.study_tree.selectionModel().select(idx, self.study_tree.selectionModel().SelectionFlag.Select)
+
+    def _findItemByText(self, parent:QStandardItemModel, study, series) -> QStandardItem | None:
+        for study_row in range(parent.rowCount()):
+            study_item = parent.item(study_row)
+            if study_item.text() != study:
+                continue
+
+            self.study_tree.expand(self.model.indexFromItem(study_item))
+            for series_row in range(study_item.rowCount()):
+                series_item = study_item.child(series_row)
+                if not series_item:
+                    continue
+
+                if series_item.text() == series:
+                    return series_item
+        return None

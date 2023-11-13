@@ -51,6 +51,11 @@ class SeriesButton(QFrame):
         self.clicked.emit()  # Emit the clicked signal
         self.window().findChild(QFrame, "ImageViewer").setup(self.series_path)
 
+        series = os.path.basename(self.series_path)
+        study = os.path.basename(os.path.dirname(self.series_path))
+
+        self.window().findChild(QFrame, "StudyNavigator").select_item(study, series)
+
 class SeriesPreview(QFrame):
     def __init__(self):
         super().__init__()
