@@ -8,6 +8,15 @@ from PyQt6.QtWidgets import QLabel, QHBoxLayout, QGraphicsDropShadowEffect, QFra
 from ImageLoader import ImageLoader
 from ScrollBar import ScrollBar
 
+class ImageScrollArea(QScrollArea):
+    def __init__(self):
+        super().__init__()
+        self.setWidgetResizable(True)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+    def wheelEvent(self, event) -> None:
+        event.ignore()
 
 class ImageViewer(QFrame):
     def __init__(self):
@@ -36,7 +45,7 @@ class ImageViewer(QFrame):
         self.file_names = []
         self.current_index = 0
 
-        self.scrollbar = ScrollBar(Qt.Orientation.Vertical)
+        self.scrollbar = ScrollBar(Qt.Orientation.Vertical, False)
         self.scrollbar.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Expanding)
         self.scrollbar.setMaximum(0)
         self.scrollbar.valueChanged.connect(self._on_scrollbar_value_changed)
@@ -52,12 +61,8 @@ class ImageViewer(QFrame):
         self.current_image.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.current_image.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.scroll_area = QScrollArea()
-        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area = ImageScrollArea()
         self.scroll_area.setWidget(self.image_container)
-        self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.scroll_area.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.setMouseTracking(True)
         self.dragging = False
         self.drag_start_point = None

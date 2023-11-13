@@ -120,8 +120,6 @@ class StudyNavigator(QFrame):
             return
 
         self.study_tree.selectionModel().clearSelection()
-
-
         idx = self.model.indexFromItem(item)
         self.study_tree.selectionModel().select(idx, self.study_tree.selectionModel().SelectionFlag.Select)
 
