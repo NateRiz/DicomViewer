@@ -9,8 +9,8 @@ class ImageLoader:
     def __init__(self):
         pass
 
-    def load_from_series(self, series_path, only_load_preview=False) -> list[QPixmap]:
-        pixmaps = []
+    def load_from_series(self, series_path, only_load_preview=False) -> dict[str, QPixmap]:
+        pixmaps = {}
         for filename in os.listdir(series_path):
             if filename.lower().endswith(('.png', '.jpg', '.jpeg')):  # Check for image files
                 image_path = os.path.join(series_path, filename)
@@ -20,7 +20,7 @@ class ImageLoader:
                     data = pil_image.tobytes("raw", "BGRA")
                     q_image = QImage(data, pil_image.size[0], pil_image.size[1], QImage.Format.Format_ARGB32)
                     pixmap = QPixmap.fromImage(q_image)
-                    pixmaps.append(pixmap)
+                    pixmaps[filename] = pixmap
                     if only_load_preview:
                         break
                 except Exception as e:
@@ -31,5 +31,5 @@ class ImageLoader:
     def load_series_preview_image(self, series_path) -> QPixmap:
         pixmaps = self.load_from_series(series_path, only_load_preview=True)
         if pixmaps:
-            return pixmaps[0]
+            return next(iter(pixmaps.values()))
         return QPixmap()
