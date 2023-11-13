@@ -12,8 +12,10 @@ class ImageNavigator(QFrame):
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.image_viewer = ImageViewer()
         self.series_preview = SeriesPreview()
+        self.layout().setContentsMargins(0, 0, 0, 0)
 
         self.v_layout.addWidget(self.image_viewer)
+        self.v_layout.addSpacing(16)
         self.v_layout.addWidget(self.series_preview)
 
     def reset(self):
