@@ -1,6 +1,8 @@
 from PyQt6.QtGui import QFont
 from PyQt6.QtWidgets import QFrame, QHBoxLayout, QPushButton
 
+from ImageExporter import ImageExporter
+
 
 class NavigatorActions(QFrame):
     def __init__(self):
@@ -31,6 +33,7 @@ class NavigatorActions(QFrame):
         }
         """)
         self.export_button = QPushButton("Export")
+        self.export_button.clicked.connect(self.on_export)
         self.export_button.setDisabled(True)
         self.export_button.setFont(font)
         self.export_button.setStyleSheet(self.load_button.styleSheet())
@@ -49,4 +52,7 @@ class NavigatorActions(QFrame):
         study_navigator.try_load_series()
 
     def on_export(self):
-        pass
+        study_navigator = self.window().findChild(QFrame, "StudyNavigator")
+        path = study_navigator.get_selected_series_path()
+        if path:
+            ImageExporter().save_series(path)

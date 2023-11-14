@@ -15,6 +15,7 @@ class ImageScrollArea(QScrollArea):
         self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.setStyleSheet("border:none")
     def wheelEvent(self, event) -> None:
         event.ignore()
 
@@ -25,6 +26,10 @@ class ImageViewer(QFrame):
         self.setStyleSheet("""
         ImageViewer{
             background-color:#1e1e1e;
+            border-top: 2px solid #7160E8;
+            border-left: 1px solid #2e2e2e;
+            border-bottom: 1px solid #2e2e2e;
+            border-right: 1px solid #2e2e2e;
         }
         QPushButton{
             color:white;
@@ -152,7 +157,7 @@ class ImageViewer(QFrame):
         self.current_index_label.setFixedWidth(width)
 
     def wheelEvent(self, event: typing.Optional[QWheelEvent]) -> None:
-        if not self.images:
+        if not self.images or not self.scrollbar.maximum():
             return
         if event.angleDelta().y() > 0:
             new_val = (self.scrollbar.value() - 1) % self.scrollbar.maximum()

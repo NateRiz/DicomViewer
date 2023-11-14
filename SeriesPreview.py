@@ -67,6 +67,7 @@ class SeriesPreview(QFrame):
         self.setStyleSheet("border:none")
 
         self.scroll_area = QScrollArea()
+        self.scroll_area.setStyleSheet("border:none")
         self.scrollable_series_preview = ScrollableSeriesPreview(self.scroll_area)
         self.scroll_area.setContentsMargins(0, 0, 0, 0)
         self.scroll_area.setWidget(self.scrollable_series_preview)
@@ -102,9 +103,9 @@ class ScrollableSeriesPreview(QFrame):
         self.setStyleSheet("""
         ScrollableSeriesPreview{
             border-top: 2px solid #7160E8;
-            border-left: 1px solid #707070;
-            border-bottom: 1px solid #707070;
-            border-right: 1px solid #707070;
+            border-left: 1px solid #2e2e2e;
+            border-bottom: 1px solid #2e2e2e;
+            border-right: 1px solid #2e2e2e;
         }
         """)
 

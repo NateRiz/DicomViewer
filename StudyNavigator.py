@@ -51,7 +51,8 @@ class StudyNavigator(QFrame):
             border-top: 2px solid #7160E8;
             border-left: 1px solid #2e2e2e;
             border-bottom: 1px solid #2e2e2e;
-            border-right: 1px solid #2e2e2e;        }
+            border-right: 1px solid #2e2e2e;
+            }
         """)
 
         self.layout_ = QVBoxLayout()
@@ -113,6 +114,15 @@ class StudyNavigator(QFrame):
                 child.setFlags(parent.flags() & ~Qt.ItemFlag.ItemIsEditable)
                 parent.appendRow(child)
             self.model.appendRow(parent)
+
+    def get_selected_series_path(self):
+        selected = self.study_tree.selectionModel().selectedIndexes()
+        if not selected:
+            return ""
+
+        index = selected[0]
+        item = self.model.itemFromIndex(index)
+        return item.file_path
 
     def select_item(self, study, series):
         item = self._findItemByText(self.study_tree.model(), study, series)
