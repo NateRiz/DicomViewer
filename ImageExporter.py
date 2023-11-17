@@ -2,29 +2,44 @@ import os
 
 from PyQt6.QtWidgets import QFileDialog, QFrame
 
-from ImageLoader import ImageLoader
-
 
 class ImageExporter(QFrame):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent):
+        super().__init__(parent=parent)
 
-    def save_series(self, path):
-        directory = QFileDialog.getExistingDirectory(self, "Select a Directory", options=QFileDialog.Option.ShowDirsOnly)
-        if not os.path.isdir(directory):
+    def save_studies(self, study_paths):
+        save_directory = QFileDialog.getExistingDirectory(self, "Select a Directory",
+                                                          options=QFileDialog.Option.ShowDirsOnly)
+        if not os.path.isdir(save_directory):
             return
 
-        image_loader = ImageLoader()
-        images = image_loader.load_from_series(path)
-        study = os.path.basename(os.path.dirname(path))
+        for study_path in study_paths:
+            self._save_study(study_path, save_directory)
+
+    def _save_study(self, study, save_directory):
+        dicom_adapter = self.window().findChild(QFrame, "MainWidget").dicom_adapter
+
+        for series in dicom_adapter.get_series_list(study):
+            sub_save_directory = os.path.join(save_directory, study, series)
+            os.makedirs(sub_save_directory, exist_ok=True)
+            self._save_series(study, series, save_directory)
+
+    def save_series(self, study, series):
+        save_directory = QFileDialog.getExistingDirectory(self, "Select a Directory",
+                                                          options=QFileDialog.Option.ShowDirsOnly)
+        if not os.path.isdir(save_directory):
+            return
+
+        self._save_series(study, series, save_directory)
+
+    def _save_series(self, study, series, save_directory):
+        dicom_adapter = self.window().findChild(QFrame, "MainWidget").dicom_adapter
+        images = dicom_adapter.load_images_from_series(study, series)
+
         file_names = []
+        sub_save_directory = os.path.join(save_directory, study, series)
+        os.makedirs(sub_save_directory, exist_ok=True)
         for file_name, pixmap in images.items():
-            file_path = os.path.join(directory, f'{study}_{file_name}')
+            file_path = os.path.join(sub_save_directory, f'{file_name}.png')
             file_names.append(file_path)
             pixmap.save(file_path, "PNG")
-
-        self.save_html(directory, file_names)
-    def save_html(self, directory, file_names):
-        file_path = os.path.join(directory, "series.html")
-        with open(file_path, "w") as file:
-            [file.write(F"<imgtag>{f}</imgtag>\n") for f in file_names]

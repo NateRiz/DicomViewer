@@ -30,3 +30,7 @@ class Navigator(QFrame):
 
     def load_dicom(self, dicom_path):
         self.studies.load_dicom(dicom_path)
+
+        dicom_adapter = self.window().findChild(QFrame, "MainWidget").dicom_adapter
+        patient_name, patient_id = dicom_adapter.get_patient_metadata()
+        self.metadata.set_patient_information(patient_name, patient_id, "")

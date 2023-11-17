@@ -22,6 +22,6 @@ class ImageNavigator(QFrame):
         self.image_viewer.reset()
         self.series_preview.reset()
 
-    def load_series(self, series_path):
-        self.image_viewer.setup(series_path)
-        self.series_preview.setup(series_path)
+    def load_series(self, study, series):
+        self.image_viewer.setup(study, series)
+        self.series_preview.setup(study)

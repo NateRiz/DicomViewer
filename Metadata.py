@@ -40,7 +40,7 @@ class Metadata(QFrame):
         self.layout_.addWidget(self.title)
         self.patient_name = self.add_row("Name", "")
         self.patient_id = self.add_row("ID", "")
-        self.patient_dob = self.add_row("DOB", "")
+        # self.patient_dob = self.add_row("DOB", "")
         self.set_patient_information("N/A", "-1", "00-00-0000")
 
     def add_row(self, key, val):
@@ -63,10 +63,10 @@ class Metadata(QFrame):
     def set_patient_information(self, name, id_, dob):
         self.patient_name.setText(name)
         self.patient_id.setText(id_)
-        self.patient_dob.setText(dob)
+        # self.patient_dob.setText(dob)
         longest_text = sorted([name, id_, dob],key=lambda n:len(n), reverse=True)[0]
         font_metrics = QFontMetrics(self.patient_name.font())
         text_width = font_metrics.horizontalAdvance(longest_text) + 32
         self.patient_name.setMinimumWidth(text_width)
         self.patient_id.setMinimumWidth(text_width)
-        self.patient_dob.setMinimumWidth(text_width)
+        # self.patient_dob.setMinimumWidth(text_width)

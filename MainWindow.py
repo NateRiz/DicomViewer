@@ -16,6 +16,7 @@ class MainWindow(QMainWindow):
 
         self.export_action = QAction("Export", self)
         self.export_action.triggered.connect(self.on_export_action)
+        self.export_action.setDisabled(True)
 
         self.exit_action = QAction("Exit", self)
         self.exit_action.triggered.connect(self.on_exit_action)

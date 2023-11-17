@@ -5,15 +5,9 @@ from PyQt6.QtGui import QStandardItemModel, QStandardItem
 from PyQt6.QtWidgets import QFrame, QVBoxLayout, QLabel, QHBoxLayout, QWidget, QPushButton, QSizePolicy, QTreeView, \
     QAbstractItemView
 
-from FakeDICOMGetter import FakeDICOMGetter
 from ScrollBar import ScrollBar
 
 
-class SeriesItem(QStandardItem):
-    def __init__(self, file_path):
-        super().__init__(os.path.basename(file_path))
-        self.file_path = file_path
-        self.file_name = os.path.basename(file_path)
 class StudyNavigator(QFrame):
     def __init__(self, load_series_callback):
         super().__init__()
@@ -97,20 +91,18 @@ class StudyNavigator(QFrame):
 
         navigator_actions = self.parent().findChild(QFrame, "NavigatorActions")
         navigator_actions.set_export_button_enabled(True)
-        self.load_series_callback(item.file_path)
+        self.load_series_callback(item.parent().text(), item.text())
 
     def load_dicom(self, dicom_path):
         self.model.clear()
-        dicom_getter = FakeDICOMGetter()
-        studies = dicom_getter.get_studies(dicom_path)
-        for study, all_series in studies.items():
-            file_name = os.path.basename(study)
-            parent = QStandardItem(file_name)
+        dicom_adapter = self.window().findChild(QFrame, "MainWidget").dicom_adapter
+        studies = dicom_adapter.get_studies()
+        for study in studies:
+            parent = QStandardItem(study)
             parent.setFlags(parent.flags() & ~Qt.ItemFlag.ItemIsEditable)
 
-            for series in all_series:
-                series_path = os.path.join(study, series)
-                child = SeriesItem(series_path)
+            for series in dicom_adapter.get_series_list(study):
+                child = QStandardItem(series)
                 child.setFlags(parent.flags() & ~Qt.ItemFlag.ItemIsEditable)
                 parent.appendRow(child)
             self.model.appendRow(parent)
@@ -118,12 +110,23 @@ class StudyNavigator(QFrame):
     def get_selected_series_path(self):
         selected = self.study_tree.selectionModel().selectedIndexes()
         if not selected:
-            return ""
+            return "", ""
 
         index = selected[0]
         item = self.model.itemFromIndex(index)
-        return item.file_path
+        if item.hasChildren():
+            # Study was selected instead of a series
+            return "", ""
+        return item.parent().text(), item.text()
 
+    def get_study_paths(self):
+
+        study_paths = []
+        for study_row in range(self.study_tree.model().rowCount()):
+            study_item = self.study_tree.model().item(study_row)
+            study_paths.append(study_item.text())
+
+        return study_paths
     def select_item(self, study, series):
         item = self._findItemByText(self.study_tree.model(), study, series)
         if item is None:

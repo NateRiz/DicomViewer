@@ -2,19 +2,18 @@ import os
 
 from PyQt6.QtCore import Qt, pyqtSignal, QSize, QPoint, QTimer
 from PyQt6.QtGui import QPixmap, QFont, QWheelEvent, QCursor
-from PyQt6.QtWidgets import QFrame, QHBoxLayout, QLabel, QScrollArea, QVBoxLayout, QSizePolicy, QApplication, \
-    QPushButton
+from PyQt6.QtWidgets import QFrame, QHBoxLayout, QLabel, QScrollArea, QVBoxLayout, QSizePolicy, QApplication
 
-from ImageLoader import ImageLoader
 from ScrollBar import ScrollBar
 
 class SeriesButton(QFrame):
     clicked = pyqtSignal()
 
-    def __init__(self, text, series_path, pixmap):
+    def __init__(self, study, series, pixmap):
         super().__init__()
         self.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-        self.series_path = series_path
+        self.study = study
+        self.series = series
         self.pixmap = pixmap
 
         self.v_layout = QVBoxLayout()
@@ -26,7 +25,7 @@ class SeriesButton(QFrame):
         self.thumbnail.setPixmap(pixmap)
 
         self.v_layout.addWidget(self.thumbnail)
-        text = QLabel(text)
+        text = QLabel(series)
         text.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.v_layout.addWidget(text)
 
@@ -49,12 +48,9 @@ class SeriesButton(QFrame):
     def mousePressEvent(self, event):
         super().mousePressEvent(event)
         self.clicked.emit()  # Emit the clicked signal
-        self.window().findChild(QFrame, "ImageViewer").setup(self.series_path)
+        self.window().findChild(QFrame, "ImageViewer").setup(self.study, self.series)
 
-        series = os.path.basename(self.series_path)
-        study = os.path.basename(os.path.dirname(self.series_path))
-
-        self.window().findChild(QFrame, "StudyNavigator").select_item(study, series)
+        self.window().findChild(QFrame, "StudyNavigator").select_item(self.study, self.series)
 
 class SeriesPreview(QFrame):
     def __init__(self):
@@ -82,8 +78,8 @@ class SeriesPreview(QFrame):
         self.v_layout.addWidget(self.scroll_area)
 
 
-    def setup(self, series_path):
-        self.scrollable_series_preview.setup(series_path)
+    def setup(self, study):
+        self.scrollable_series_preview.setup(study)
 
     def reset(self):
         self.scrollable_series_preview.reset()
@@ -109,17 +105,13 @@ class ScrollableSeriesPreview(QFrame):
         }
         """)
 
-    def setup(self, series_path):
+    def setup(self, study):
         self.reset()
         buttons = []
-        studies_path = os.path.dirname(series_path)
-        series_paths = os.listdir(studies_path)
-        for series in series_paths:
-            full_path = os.path.join(studies_path, series)
-            if not os.path.isdir(full_path):
-                continue
-
-            buttons.append(self.create_thumbnail(series, full_path))
+        dicom_adapter = self.window().findChild(QFrame, "MainWidget").dicom_adapter
+        series_list = dicom_adapter.get_series_list(study)
+        for series in series_list:
+            buttons.append(self.create_thumbnail(study, series))
 
         self.updateGeometry()
         QApplication.processEvents()
@@ -134,8 +126,8 @@ class ScrollableSeriesPreview(QFrame):
             if widget is not None:
                 widget.deleteLater()
 
-    def create_thumbnail(self, series, full_path):
-        image_loader = ImageLoader()
-        pixmap = image_loader.load_series_preview_image(full_path)
+    def create_thumbnail(self, study, series):
+        dicom_adapter = self.window().findChild(QFrame, "MainWidget").dicom_adapter
+        pixmap = dicom_adapter.load_series_preview_image(study, series)
         scaled_pixmap = pixmap.scaled(78, 78)
-        return SeriesButton(series, full_path, scaled_pixmap)
+        return SeriesButton(study, series, scaled_pixmap)

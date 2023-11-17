@@ -29,7 +29,4 @@ if __name__ == '__main__':
 # TODO
 """
 - export to single dicom in open dialog
-- zoom in and pan on image viewer
-- actual export
-- open doesnt delete file tree
 """

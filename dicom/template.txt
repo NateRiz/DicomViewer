@@ -1,0 +1,17 @@
+<!-- $group image stack in the body of the display. -->
+<$grouptag>
+	<div id="$group scroll"></div>
+	<img class="$group" src="0001\FillLECA\001.png">
+	<img class="$group" src="0001\FillLECA\002.png">
+
+<$grouptag>
+<small><i>
+	Images:0001\FillLECA
+</i></small>
+
+var stack3 = new ImageStack({
+	images: '$group',
+	height: '800px',
+	width: '800px',
+	granularity:0.019 });
+document.getElementById("$group scroll").appendChild(stack3);

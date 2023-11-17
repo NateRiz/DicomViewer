@@ -4,9 +4,8 @@ from PyQt6.QtCore import QSize
 from PyQt6.QtGui import QFont
 from PyQt6.QtWidgets import QHBoxLayout, QFileDialog, QFrame, QApplication, QSizePolicy
 
+from DicomAdapter import DicomAdapter
 from ImageNavigator import ImageNavigator
-from ImageViewer import ImageViewer
-from Metadata import Metadata
 from Navigator import Navigator
 from OpenDialog import OpenDialog
 
@@ -15,6 +14,7 @@ class MainWidget(QFrame):
     def __init__(self):
         super().__init__()
         self.setObjectName("MainWidget")
+        self.dicom_adapter = None
         self.h_layout = QHBoxLayout()
         self.setLayout(self.h_layout)
         self.open_dialog = OpenDialog(self.on_menu_open)
@@ -26,16 +26,17 @@ class MainWidget(QFrame):
 
     def on_menu_open(self):
         file_dialog = QFileDialog()
-        path, _ = file_dialog.getOpenFileName(self, "Open DICOMDIR File")
+        dicom_path, _ = file_dialog.getOpenFileName(self, "Open DICOMDIR File")
+        self.dicom_adapter = DicomAdapter(dicom_path)
 
-        if not path:
+        if not dicom_path:
             return
 
         self.window().resize(QSize(1536,1024))
         self.reset_window()
-        self.navigator.load_dicom(path)
         self.h_layout.addWidget(self.navigator)
         self.h_layout.addWidget(self.image_navigator)
+        self.navigator.load_dicom(dicom_path)
         self.recenter_window()
 
     def recenter_window(self):
@@ -55,5 +56,5 @@ class MainWidget(QFrame):
             if widget:
                 widget.setParent(None)
 
-    def load_series(self, series_path):
-        self.image_navigator.load_series(series_path)
+    def load_series(self, study, series):
+        self.image_navigator.load_series(study, series)

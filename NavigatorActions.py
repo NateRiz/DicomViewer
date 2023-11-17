@@ -1,3 +1,5 @@
+import os.path
+
 from PyQt6.QtGui import QFont
 from PyQt6.QtWidgets import QFrame, QHBoxLayout, QPushButton
 
@@ -32,13 +34,19 @@ class NavigatorActions(QFrame):
             border: 1px solid #707070;
         }
         """)
-        self.export_button = QPushButton("Export")
+        self.export_button = QPushButton("Export Series")
         self.export_button.clicked.connect(self.on_export)
         self.export_button.setDisabled(True)
         self.export_button.setFont(font)
         self.export_button.setStyleSheet(self.load_button.styleSheet())
 
+        self.export_all_button = QPushButton("Export Study")
+        self.export_all_button.clicked.connect(self.on_export_all)
+        self.export_all_button.setFont(font)
+        self.export_all_button.setStyleSheet(self.load_button.styleSheet())
+
         self.h_layout.addWidget(self.load_button)
+        self.h_layout.addWidget(self.export_all_button)
         self.h_layout.addWidget(self.export_button)
 
     def set_load_button_enabled(self, is_enabled):
@@ -53,6 +61,12 @@ class NavigatorActions(QFrame):
 
     def on_export(self):
         study_navigator = self.window().findChild(QFrame, "StudyNavigator")
-        path = study_navigator.get_selected_series_path()
-        if path:
-            ImageExporter().save_series(path)
+        study, series = study_navigator.get_selected_series_path()
+        if not study or not series:
+            print("No series selected. Canceling.")
+            return
+        ImageExporter(self).save_series(study, series)
+
+    def on_export_all(self):
+        study_navigator = self.window().findChild(QFrame, "StudyNavigator")
+        ImageExporter(self).save_studies(study_navigator.get_study_paths())

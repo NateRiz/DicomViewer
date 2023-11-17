@@ -5,8 +5,8 @@ from PyQt6.QtGui import QPixmap, QWheelEvent, QColor, QFont
 from PyQt6.QtWidgets import QLabel, QHBoxLayout, QGraphicsDropShadowEffect, QFrame, QSizePolicy, QScrollArea, QWidget, \
     QPushButton
 
-from ImageLoader import ImageLoader
 from ScrollBar import ScrollBar
+
 
 class ImageScrollArea(QScrollArea):
     def __init__(self):
@@ -16,8 +16,10 @@ class ImageScrollArea(QScrollArea):
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.setStyleSheet("border:none")
+
     def wheelEvent(self, event) -> None:
         event.ignore()
+
 
 class ImageViewer(QFrame):
     def __init__(self):
@@ -92,13 +94,13 @@ class ImageViewer(QFrame):
         font.setStyleStrategy(QFont.StyleStrategy.PreferAntialias)
         self.zoom_in = QPushButton("+", parent=self.scroll_area.viewport())
         self.zoom_in.setFixedSize(32, 32)
-        self.zoom_in.clicked.connect(lambda:self._zoom_in_out(1))
+        self.zoom_in.clicked.connect(lambda: self._zoom_in_out(1))
         self.zoom_in.setFont(font)
         self.zoom_in.hide()
 
         self.zoom_out = QPushButton("-", parent=self.scroll_area.viewport())
         self.zoom_out.setFixedSize(32, 32)
-        self.zoom_out.clicked.connect(lambda:self._zoom_in_out(-1))
+        self.zoom_out.clicked.connect(lambda: self._zoom_in_out(-1))
         self.zoom_out.setFont(font)
         self.zoom_out.hide()
 
@@ -106,16 +108,17 @@ class ImageViewer(QFrame):
         if not self.images:
             return
 
-        self.unscaled_pixmap = QPixmap(self.images[self.file_names[self.current_index]])
+        self.unscaled_pixmap = self.images[self.file_names[self.current_index]]
         self.update_pixmap_with_scale()
 
     def _show_next_image(self):
         self.current_index = (self.current_index + 1) % len(self.images)
         self._show_image(self.current_index)
 
-    def setup(self, series_path):
-        image_loader = ImageLoader()
-        self.images = image_loader.load_from_series(series_path)
+    def setup(self, study, series):
+        dicom_adapter = self.window().findChild(QFrame, "MainWidget").dicom_adapter
+        self.images = dicom_adapter.load_images_from_series(study, series)
+
         self.file_names = list(self.images.keys())
         self.scrollbar.setMaximum(len(self.images) - 1)
         self.current_index = 0
@@ -123,7 +126,8 @@ class ImageViewer(QFrame):
 
         right_edge = self.scroll_area.viewport().width()
         self.zoom_in.move(right_edge - self.zoom_in.width() - 8, self.scroll_area.y() + 8)
-        self.zoom_out.move(right_edge - self.zoom_out.width() - 8, self.scroll_area.y() + 8 + self.zoom_out.height() + 8)
+        self.zoom_out.move(right_edge - self.zoom_out.width() - 8,
+                           self.scroll_area.y() + 8 + self.zoom_out.height() + 8)
         self.zoom_in.show()
         self.zoom_out.show()
 
