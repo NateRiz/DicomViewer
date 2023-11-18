@@ -1,12 +1,10 @@
 <!-- $group image stack in the body of the display. -->
 <$grouptag>
 	<div id="$group scroll"></div>
-	<img class="$group" src="0001\FillLECA\001.png">
-	<img class="$group" src="0001\FillLECA\002.png">
-
+$imgtags
 <$grouptag>
 <small><i>
-	Images:0001\FillLECA
+	Images:$seriespath
 </i></small>
 
 var stack3 = new ImageStack({

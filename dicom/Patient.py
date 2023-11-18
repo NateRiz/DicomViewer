@@ -20,5 +20,5 @@ class Patient:
         return self.studies
 
     def export_all(self):
-        for s in tqdm(self.studies, desc="Processing", ascii=False, ncols=75):
+        for s in tqdm(self.studies.values(), desc="Processing", ascii=False, ncols=75):
             s.export_all()

@@ -20,5 +20,5 @@ class Study:
         return self.series
 
     def export_all(self):
-        for s in self.series:
+        for s in self.series.values():
             s.export()

@@ -27,11 +27,11 @@ class MainWidget(QFrame):
     def on_menu_open(self):
         file_dialog = QFileDialog()
         dicom_path, _ = file_dialog.getOpenFileName(self, "Open DICOMDIR File")
-        self.dicom_adapter = DicomAdapter(dicom_path)
 
         if not dicom_path:
             return
 
+        self.dicom_adapter = DicomAdapter(dicom_path)
         self.window().resize(QSize(1536,1024))
         self.reset_window()
         self.h_layout.addWidget(self.navigator)
