@@ -1,5 +1,7 @@
-from dicom.Series import Series
-
+try:
+    from dicom.Series import Series
+except ImportError:
+    from Series import Series
 
 class Study:
     def __init__(self, study, study_name, dicom_path):
@@ -15,6 +17,9 @@ class Study:
                     series_name = "".join([c for c in i.SeriesDescription if c.isalnum()][:MAX_FILE_NAME_LENGTH])
                 series_id = str(i.SeriesNumber)
                 self.series[series_name] = Series(i, series_name, self.study_name, series_id, dicom_path)
+
+    def create_series(self, series):
+        pass
 
     def get_series(self):
         return self.series

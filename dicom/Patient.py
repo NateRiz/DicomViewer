@@ -1,5 +1,8 @@
-from dicom.Study import Study
 from tqdm import tqdm
+try:
+    from dicom.Study import Study
+except ImportError:
+    from Study import Study
 
 
 class Patient:

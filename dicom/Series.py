@@ -1,9 +1,13 @@
 import os
 from os import path, mkdir
-from dicom import pydicom_PIL
 from pydicom import dcmread
-from dicom.html_exporter import HTMLExporter
 
+try:
+    from dicom import pydicom_PIL
+    from dicom.html_exporter import HTMLExporter
+except ImportError:
+    import pydicom_PIL
+    from html_exporter import HTMLExporter
 
 class Series:
     def __init__(self, series, series_name, study_name, series_id, dicom_path):
